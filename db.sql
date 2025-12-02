@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS expenses (
     title VARCHAR(30) NOT NULL,
     amount DECIMAL(10, 2) NOT NULL,
     description TEXT DEFAULT NULL,
-    date DATETIME DEFAULT CURRENT_TIMESTAMP
+    date DATE DEFAULT curdate()
 ); 
 
 
@@ -19,5 +19,7 @@ CREATE TABLE IF NOT EXISTS incomes (
     title VARCHAR(30) NOT NULL,
     amount DECIMAL(10, 2) NOT NULL,
     description TEXT DEFAULT NULL,
-    date DATETIME DEFAULT CURRENT_TIMESTAMP
+    date DATE DEFAULT curdate()
 ); 
+
+select * from incomes;
