@@ -1,12 +1,13 @@
 <?php
     include "TransactionController.php";
 
+    $id = $_POST["id"];
     $type = $_POST["type"];
     $title = $_POST["title"];
     $amount = $_POST["amount"];
     $description = $_POST["description"];
     $date = $_POST["date"];
 
-    TransactionController::CreateTransaction($type, $title, $amount, $description, $date);
+    TransactionController::updateTransaction($id, $type, $title, $amount, $description, $date);
 
-    header("location: " . $_SERVER["HTTP_REFERER"]);
+    header("location: transactions.php");
