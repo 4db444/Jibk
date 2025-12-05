@@ -1,60 +1,60 @@
 <?php
 
-class TransactionController {
+    class TransactionController {
 
-    private static $connection;
+        private static $connection;
 
-    static function Connect () {
-        try {
-            self::$connection = new PDO("mysql:host=localhost;dbname=jibk", "root", "Brahim@444");
-        }catch(PDOException $e){
-            echo "Error: " . $e->getMessage();
-        }
-    }
-
-    static function CreateTransaction (string $type, string $title, float $amount, string $description, string $date){
-
-        if(empty($date)){
-            $sql = "insert into $type (title, amount, description) values ('$title', $amount, '$description')";
-        }else {
-            $sql = "insert into $type (title, amount, description, date) values ('$title', $amount, '$description', '$date')";
+        static function Connect () {
+            try {
+                self::$connection = new PDO("mysql:host=localhost;dbname=jibk", "root", "Brahim@444");
+            }catch(PDOException $e){
+                echo "Error: " . $e->getMessage();
+            }
         }
 
-        $query = self::$connection->query($sql);
+        static function CreateTransaction (string $type, string $title, float $amount, string $description, string $date){
 
-    }
+            if(empty($date)){
+                $sql = "insert into $type (title, amount, description) values ('$title', $amount, '$description')";
+            }else {
+                $sql = "insert into $type (title, amount, description, date) values ('$title', $amount, '$description', '$date')";
+            }
 
-    static function ShowAllTransactions (){
-        return self::$connection->query("
-            select *, 'incomes' as 'table' from incomes 
-            union select *, 'expenses' as 'table' from expenses
-            order by date desc
-        ");
-    }
+            $query = self::$connection->query($sql);
 
-    static function DeleteTransaction(string $table, int $id){
-        self::$connection->query("delete from $table where id = $id");
-    }
+        }
 
-    static function ShowTransaction(string $table, int $id){
-        return self::$connection->query("select * from $table where id = $id");
-    }
+        static function ShowAllTransactions (){
+            return self::$connection->query("
+                select *, 'incomes' as 'table' from incomes 
+                union select *, 'expenses' as 'table' from expenses
+                order by date desc
+            ");
+        }
 
-    static function UpdateTransaction (int $id, string $type, string $title, float $amount, string $description, string $date){
-        if(empty($date)){
-            $sql = "update $type 
-                set title = \"$title\", amount = $amount, description = \"$description\"
+        static function DeleteTransaction(string $table, int $id){
+            self::$connection->query("delete from $table where id = $id");
+        }
+
+        static function ShowTransaction(string $table, int $id){
+            return self::$connection->query("select * from $table where id = $id");
+        }
+
+        static function UpdateTransaction (int $id, string $type, string $title, float $amount, string $description, string $date){
+            if(empty($date)){
+                $sql = "update $type 
+                    set title = \"$title\", amount = $amount, description = \"$description\"
+                    where id = $id
+                ";
+            }else {
+                $sql = "update $type
+                set title = \"$title\", amount = $amount, description = \"$description\", date = \"$date\"
                 where id = $id
             ";
-        }else {
-            $sql = "update $type
-            set title = \"$title\", amount = $amount, description = \"$description\", date = \"$date\"
-            where id = $id
-        ";
+            }
+
+            $query = self::$connection->query($sql);
         }
-
-        $query = self::$connection->query($sql);
     }
-}
 
-TransactionController::Connect();
+    TransactionController::Connect();
