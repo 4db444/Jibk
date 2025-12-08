@@ -1,123 +1,153 @@
 <?php
     include "TransactionController.php";
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <title>Transactions</title>
 </head>
-<body>
+
+<body class="bg-gray-100 min-h-screen">
     <?php include "./components/header.php" ?>
-    <div id="modal" class="fixed w-full h-full bg-black/50 top-0 left-0 flex justify-center items-center hidden">
-        <form  action="./addTransaction.php" method="post" class="bg-white w-[400px] p-4 flex flex-col gap-3 rounded">
-            <h1 class="text-center text-2xl text-green-600 font-semibold">Add Transaction</h1>
+
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 bg-black/50 flex justify-center items-center hidden">
+        <form action="./addTransaction.php" method="post"
+              class="bg-white w-[400px] p-6 rounded-lg shadow-xl flex flex-col gap-4">
+
+            <h1 class="text-2xl font-semibold text-green-600 text-center">Add Transaction</h1>
+
             <div>
-                <label for="title" class="block capitalize">title</label>
-                <input class="w-full border border-gray border-1 px-2 py-1 rounded-[7px]" type="text" name="title" id="title" required>
-            </div>
-            <div>
-                <label for="amount" class="block capitalize">amount</label>
-                <input class="w-full border border-gray border-1 px-2 py-1 rounded-[7px]" type="number" name="amount" id="amount" required>
-            </div>
-            <div>
-                <label for="description" class="block capitalize">description</label>
-                <textarea class="resize-none w-full border border-gray border-1 px-2 py-1 rounded-[7px]" name="description" id="description"></textarea>
-            </div>
-            <div>
-                <label for="date" class="block capitalize">date</label>
-                <input class="w-full border border-gray border-1 px-2 py-1 rounded-[7px]" type="date" id="date" name="date">
+                <label class="block font-medium mb-1" for="title">Title</label>
+                <input type="text" name="title" id="title" required
+                       class="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-green-500 outline-none">
             </div>
 
             <div>
-                <label class="block capitalize" for="type">type</label>
-                <select class="w-full border border-gray border-1 px-2 py-1 rounded-[7px]" name="type" id="type" required>
-                    <option value="" selected disabled>select a transaction type</option>
+                <label class="block font-medium mb-1" for="amount">Amount</label>
+                <input type="number" name="amount" id="amount" required
+                       class="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-green-500 outline-none">
+            </div>
+
+            <div>
+                <label class="block font-medium mb-1" for="description">Description</label>
+                <textarea name="description" id="description"
+                          class="w-full border border-gray-300 px-3 py-2 rounded-lg resize-none focus:ring-2 focus:ring-green-500 outline-none"></textarea>
+            </div>
+
+            <div>
+                <label class="block font-medium mb-1" for="date">Date</label>
+                <input type="date" name="date" id="date"
+                       class="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-green-500 outline-none">
+            </div>
+
+            <div>
+                <label class="block font-medium mb-1" for="type">Type</label>
+                <select name="type" id="type" required
+                        class="w-full border border-gray-300 px-3 py-2 rounded-lg focus:ring-2 focus:ring-green-500 outline-none">
+                    <option value="" disabled selected>Select transaction type</option>
                     <option value="expenses">Expense</option>
                     <option value="incomes">Income</option>
                 </select>
             </div>
-            <button type="submit" class="bg-green-500 text-white p-2 rounded">submit</button>
+
+            <button type="submit" class="bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700">Submit</button>
         </form>
     </div>
 
-    <div class="flex justify-between p-3">
-        <h1 class="text-4xl">Transactions</h1>
-        <button id="add-modal-btn" class="bg-green-600 text-white rounded p-3">Add Transaction</button>
+    <!-- Page Header -->
+    <div class="max-w-7xl mx-auto p-6 flex justify-between items-center">
+        <h1 class="text-3xl font-bold">Transactions</h1>
+
+        <button id="add-modal-btn"
+                class="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-lg font-semibold shadow">
+            <i class="fa-solid fa-plus mr-2"></i>Add Transaction
+        </button>
     </div>
 
-    <table border="1" class="mx-auto border-collapse border border-gray-400 w-full">
-        <thead>
-            <tr class="border-b border-blue-800 p-2 capitalize">
-                <th class="text-start">title</th>
-                <th class="text-start">amount</th>
-                <th class="text-start">type</th>
-                <th class="text-start">date</th>
-                <th class="text-start">description</th>
-                <th class="text-start">actions</th>
-            </tr>
-        </thead>
-        <?php
-            $query_res = TransactionController::ShowAllTransactions();
-
-            echo "<tbody>";
-            while ($row = $query_res->fetch(PDO::FETCH_ASSOC)){
-                echo "
-                <tr class=\"border-b border-blue-800\">
-                    <td>
-                        {$row["title"]} 
-                    </td>
-                    <td>
-                        {$row["amount"]} 
-                    </td>
-                    <td> <span class=\"aspect-1/1 block w-[25px] h-[25px] border text-" . ($row["table"] == "expenses" ? "red" : "green") . "-600 border-" . ($row["table"] == "expenses" ? "red" : "green") . "-600 border-3 rounded-full flex justify-center items-center\">" .
-                        ($row["table"] == "incomes" ? 
-                        "<i class=\"fa-solid fa-arrow-down\"></i>"
-                        :
-                        "<i class=\"fa-solid fa-arrow-up\"></i>")
-                        ."
-                    </span></td>
-                    <td>
-                        {$row["date"]} 
-                    </td>
-                    <td>
-                        {$row["description"]} 
-                    </td>
-                    <td class=\"flex gap-2 p-3\">
-                        <form action='editTransaction.php' method='post'>
-                            <input type='hidden' value='{$row['id']}' name='id'/>
-                            <input type='hidden' value='{$row['table']}' name='table'/>
-                            <button type='submit' class=\"text-white bg-yellow-500 p-2 rounded-[10px] capitalize\">update</button>
-                        </form>
-
-                        <form action='deleteTransaction.php' method='post'>
-                            <input type='hidden' value='{$row['id']}' name='id'/>
-                            <input type='hidden' value='{$row['table']}' name='table'/>
-                            <button type='submit' class=\"text-white bg-red-500 p-2 rounded-[10px] capitalize\">delete</button>
-                        </form>
-                    </td>
+    <!-- Table Container -->
+    <div class="max-w-7xl mx-auto p-6 bg-white shadow rounded-lg">
+        <table class="w-full border-collapse">
+            <thead>
+                <tr class="bg-gray-100 border-b border-gray-300 text-left">
+                    <th class="py-3 px-2 font-semibold">Title</th>
+                    <th class="py-3 px-2 font-semibold">Amount</th>
+                    <th class="py-3 px-2 font-semibold">Type</th>
+                    <th class="py-3 px-2 font-semibold">Date</th>
+                    <th class="py-3 px-2 font-semibold">Description</th>
+                    <th class="py-3 px-2 font-semibold">Actions</th>
                 </tr>
-                ";
-            }
-            echo "</tbody>";
-        ?>
-    </table>
+            </thead>
 
+            <tbody>
+                <?php
+                    $query_res = TransactionController::ShowAllTransactions();
+
+                    while ($row = $query_res->fetch(PDO::FETCH_ASSOC)) {
+
+                        $isExpense = $row["table"] === "expenses";
+                        $color = $isExpense ? "red" : "green";
+                        $icon = $isExpense ? "fa-arrow-up" : "fa-arrow-down";
+
+                        echo "
+                        <tr class='border-b border-gray-200 hover:bg-gray-50'>
+                            <td class='py-3 px-2'>{$row["title"]}</td>
+                            <td class='py-3 px-2'>{$row["amount"]}</td>
+
+                            <td class='py-3 px-2'>
+                                <span class='w-7 h-7 rounded-full border-2 border-$color-600 text-$color-600 flex justify-center items-center'>
+                                    <i class='fa-solid $icon'></i>
+                                </span>
+                            </td>
+
+                            <td class='py-3 px-2'>{$row["date"]}</td>
+                            <td class='py-3 px-2'>{$row["description"]}</td>
+
+                            <td class='py-3 px-2 flex gap-2'>
+
+                                <form action=\"editTransaction.php\" method=\"post\">
+                                    <input type='hidden' name='id' value='{$row['id']}'>
+                                    <input type='hidden' name='table' value='{$row['table']}'>
+                                    <button type='submit'
+                                        class='bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded-lg text-sm'>
+                                        Update
+                                    </button>
+                                </form>
+
+                                <form action=\"deleteTransaction.php\" method=\"post\">
+                                    <input type='hidden' name='id' value='{$row['id']}'>
+                                    <input type='hidden' name='table' value='{$row['table']}'>
+                                    <button type='submit'
+                                        class='bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm'>
+                                        Delete
+                                    </button>
+                                </form>
+
+                            </td>
+                        </tr>
+                        ";
+                    }
+                ?>
+            </tbody>
+        </table>
+    </div>
 
     <script>
-        let modal = document.getElementById("modal");
-        document.getElementById("add-modal-btn").addEventListener("click", () => {
-            modal.classList.toggle("hidden");
+        const modal = document.getElementById("modal");
+        const btn = document.getElementById("add-modal-btn");
+
+        btn.addEventListener("click", () => {
+            modal.classList.remove("hidden");
         });
+
         modal.addEventListener("click", e => {
-            if(e.target.id === "modal"){
-                modal.classList.add("hidden")
-            }
+            if (e.target.id === "modal") modal.classList.add("hidden");
         });
     </script>
+
 </body>
 </html>

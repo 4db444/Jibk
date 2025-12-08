@@ -55,6 +55,32 @@
 
             $query = self::$connection->query($sql);
         }
+
+        static function GetTotoalTransactions (string $table){
+            $sql = "select sum(amount) as sum from $table";
+
+            return self::$connection->query($sql)->fetch(PDO::FETCH_ASSOC)["sum"]; 
+        }
+
+        static function GetCurrentMonthTransactions (string $table){
+            $sql = "
+                select sum(amount) as total
+                from $table
+                where month(date) = month(CURRENT_TIME);
+            ";
+
+            return self::$connection->query($sql)->fetch(PDO::FETCH_ASSOC)["total"];
+        }
+
+        static function GetTotoalTransactionsPerMonth (string $table){
+            $sql = "select MONTHNAME(date) as month, sum(amount) as total
+                from $table
+                GROUP BY month
+                limit 12;
+            ";
+
+            return self::$connection->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+        }
     }
 
     TransactionController::Connect();
